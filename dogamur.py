@@ -42,6 +42,7 @@ MENU = "menu"
 state = MENU
 LEVEL1 = "level1"
 LEVEL2 = "level2"
+LEVEL3 = "level3"
 
 # ==================== BUTTON ====================
 class Button:
@@ -118,8 +119,24 @@ class Player(Rect):
         pygame.draw.rect(surface, PLAYER_COLOR, self)
 
 # ==================== LEVEL ====================
-platforms1 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(200, 380, 200, 20), Rect(500, 300, 180, 20)]
-platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(100, 280, 100, 30), Rect(350, 340, 180, 20)]
+platforms1 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
+              Rect(190, 150, 200, 20), 
+              Rect(500, 450, 180, 20),
+              Rect(190, 600, 350, 20),
+              Rect(600, 290, 350, 20)]
+
+platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
+              Rect(35, 280, 150, 20), 
+              Rect(350, 340, 180, 20),
+              Rect(450, 240, 180, 20),
+              Rect(650, 140, 180, 20),
+              Rect(800, 440, 230, 20)]
+
+platforms3 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
+              Rect(30, 280, 180, 20), 
+              Rect(350, 340, 180, 20),
+              Rect(510, 240, 180, 20),
+              Rect(610, 440, 180, 20)]
 
 player = Player(100, 100)
 
@@ -137,6 +154,11 @@ while running:
         
         if state == LEVEL1 and player.right > WIDTH:
             state = LEVEL2
+            player.x, player.y = 0, 100
+            player.vel_x, player.vel_y = 0, 0
+            
+        if state == LEVEL2 and player.right > WIDTH:
+            state = LEVEL3
             player.x, player.y = 0, 100
             player.vel_x, player.vel_y = 0, 0
 
@@ -158,6 +180,14 @@ while running:
         screen.fill(BG)
         
         current_platforms = platforms1 if state == LEVEL1 else platforms2
+        if state == LEVEL1:
+            current_platforms = platforms1
+        elif state == LEVEL2:
+            current_platforms = platforms2
+        elif state == LEVEL3:
+            current_platforms = platforms3  
+        else:
+            current_platforms = platforms3
         player.update(current_platforms)
         for p in current_platforms:
             pygame.draw.rect(screen, PLATFORM_COLOR, p)
