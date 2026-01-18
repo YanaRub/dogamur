@@ -1,121 +1,169 @@
+import pygame
 from pygame import *
-import sys
 
-# ================== ІНІЦІАЛІЗАЦІЯ ==================
-init()
-
-# Розмір вікна
-WIDTH, HEIGHT = 900, 500
-screen = display.set_mode((WIDTH, HEIGHT))
-display.set_caption("Dog Amur")
-
-clock = time.Clock()
+# ==================== CONFIG ====================
+WIDTH, HEIGHT = 1200, 700
 FPS = 60
 
-# ================== КОЛЬОРИ (ТИМЧАСОВІ) ==================
-# ⚠️ КОЛИ БУДУТЬ КАРТИНКИ — ЦЕ МОЖНА ВИДАЛИТИ
-WHITE = (255, 255, 255)
-BROWN = (160, 110, 60)
-BLUE = (120, 180, 255)
-GREEN = (80, 170, 80)
-BLACK = (0, 0, 0)
+GRAVITY = 0.9
+PLAYER_SPEED = 6
+JUMP_FORCE = 18
 
-# ================== ГРАВЕЦЬ — ПЕС АМУР ==================
-# Прямокутник — тимчасова форма персонажа
-amur = Rect(100, 350, 40, 50)
+# COLORS
+BG = (25, 25, 35)
+WHITE = (240, 240, 240)
+GRAY = (180, 180, 180)
+HOVER = (220, 220, 220)
+GREEN = (0, 200, 0)
+PLAYER_COLOR = (80, 200, 255)
+PLATFORM_COLOR = (200, 200, 200)
 
-# 👉 У МАЙБУТНЬОМУ:
-# amur_img = image.load("assets/amur_idle.png").convert_alpha()
-# amur_img = transform.scale(amur_img, (40, 50))
-
-amur_speed = 5
-jump_power = 14
-gravity = 0.8
-y_velocity = 0
-on_ground = False
-
-# ================== ПЛАТФОРМИ / ОБʼЄКТИ ==================
-# Це можуть бути: земля, будинки, ящики, сходи
-platforms = [
-    Rect(0, 400, WIDTH, 100),      # земля
-    Rect(200, 320, 120, 20),       # платформа
-    Rect(400, 280, 120, 20),
-    Rect(650, 350, 150, 20),
-]
-
-# 👉 У МАЙБУТНЬОМУ:
-# platform_img = image.load("assets/platform.png").convert_alpha()
-
-# ================== ФОН ==================
-# Поки що просто небо
-# 👉 Потім: вулиця, двір, підʼїзд, підвал
-def draw_background():
-    screen.fill(BLUE)
-
-    # 👉 З КАРТИНКОЮ:
-    # screen.blit(background_img, (0, 0))
-
-
-# ================== ФУНКЦІЯ РУХУ ТА ФІЗИКИ ==================
-def move_player():
-    global y_velocity, on_ground
-
-    keys = key.get_pressed()
-
-    # ---- рух вліво / вправо ----
-    if keys[K_a]:
-        amur.x -= amur_speed
-    if keys[K_d]:
-        amur.x += amur_speed
-
-    # ---- стрибок ----
-    if keys[K_SPACE] and on_ground:
-        y_velocity = -jump_power
-        on_ground = False
-
-    # ---- гравітація ----
-    y_velocity += gravity
-    amur.y += y_velocity
-
-    # ---- перевірка зіткнення з платформами ----
-    on_ground = False
-    for platform in platforms:
-        if amur.colliderect(platform) and y_velocity > 0:
-            amur.bottom = platform.top
-            y_velocity = 0
-            on_ground = True
-
-
-# ================== ГОЛОВНИЙ ЦИКЛ ГРИ ==================
+# ==================== INIT ====================
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Platformer with Menu")
+clock = pygame.time.Clock()
 running = True
-while running:
-    clock.tick(FPS)
 
-    # ---- події ----
-    for e in event.get():
-        if e.type == QUIT:
+try:
+    menu_bg = pygame.image.load("background.jpg") 
+    menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
+except:
+    # Якщо картинка не знайдена, створюємо просто темний фон, щоб гра не вилітала
+    menu_bg = pygame.Surface((WIDTH, HEIGHT))
+    menu_bg.fill((20, 20, 30))
+
+# ==================== FONTS ====================
+title_font = pygame.font.SysFont("comicsansms", 64, bold=True)
+button_font = pygame.font.SysFont("comicsansms", 28)
+
+# ==================== GAME STATE ====================
+MENU = "menu"
+state = MENU
+LEVEL1 = "level1"
+LEVEL2 = "level2"
+
+# ==================== BUTTON ====================
+class Button:
+    def __init__(self, text, x, y, w, h):
+        self.text = text
+        self.rect = Rect(x, y, w, h)
+
+    def draw(self, surface):
+        mouse_pos = pygame.mouse.get_pos()
+        color = HOVER if self.rect.collidepoint(mouse_pos) else GRAY
+        pygame.draw.rect(surface, color, self.rect, border_radius=8)
+
+        label = button_font.render(self.text, True, BG)
+        surface.blit(label, label.get_rect(center=self.rect.center))
+
+    def clicked(self, event):
+        return (
+            event.type == MOUSEBUTTONDOWN
+            and event.button == 1
+            and self.rect.collidepoint(event.pos)
+        )
+
+# ==================== MENU ====================
+start_button = Button("START", WIDTH // 2 - 80, HEIGHT // 2 + 40, 160, 50)
+exit_button = Button("EXIT", WIDTH // 2 - 80, HEIGHT // 2 + 110, 160, 50)
+
+# ==================== PLAYER ====================
+class Player(Rect):
+    def __init__(self, x, y):
+        super().__init__(x, y, 40, 60)
+        self.vel_x = 0.0
+        self.vel_y = 0.0
+        self.on_ground = False
+
+    def input(self):
+        keys = pygame.key.get_pressed()
+        self.vel_x = 0
+        if keys[K_a] or keys[K_LEFT]: self.vel_x = -PLAYER_SPEED
+        if keys[K_d] or keys[K_RIGHT]: self.vel_x = PLAYER_SPEED
+        if keys[K_SPACE] and self.on_ground:
+            self.vel_y = -JUMP_FORCE
+            self.on_ground = False
+
+    def apply_gravity(self):
+        self.vel_y += GRAVITY
+
+    def move_x(self, platforms):
+        self.x += self.vel_x
+        for p in platforms:
+            if self.colliderect(p):
+                if self.vel_x > 0: self.right = p.left
+                elif self.vel_x < 0: self.left = p.right
+
+    def move_y(self, platforms):
+        self.y += self.vel_y
+        self.on_ground = False
+        for p in platforms:
+            if self.colliderect(p):
+                if self.vel_y > 0:
+                    self.bottom = p.top
+                    self.vel_y = 0
+                    self.on_ground = True
+                elif self.vel_y < 0:
+                    self.top = p.bottom
+                    self.vel_y = 0
+
+    def update(self, platforms):
+        self.input()
+        self.apply_gravity()
+        self.move_x(platforms)
+        self.move_y(platforms)
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, PLAYER_COLOR, self)
+
+# ==================== LEVEL ====================
+platforms1 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(200, 380, 200, 20), Rect(500, 300, 180, 20)]
+platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(100, 280, 100, 30), Rect(350, 340, 180, 20)]
+
+player = Player(100, 100)
+
+# ==================== MAIN LOOP ====================
+while running:
+    for event in pygame.event.get():
+        if event.type == QUIT:
             running = False
 
-    # ---- логіка ----
-    move_player()
+        if state == MENU:
+            if start_button.clicked(event):
+                state = LEVEL1
+            if exit_button.clicked(event):
+                running = False
+        
+        if state == LEVEL1 and player.right > WIDTH:
+            state = LEVEL2
+            player.x, player.y = 0, 100
+            player.vel_x, player.vel_y = 0, 0
 
-    # ---- малювання ----
-    draw_background()
+    # ==================== DRAWING ====================
+    if state == MENU:
+        # 1. Малюємо картинку фону замість screen.fill
+        screen.blit(menu_bg, (0, 0))
+        
+        # Логотип і текст зверху фону
+        pygame.draw.rect(screen, GREEN, (WIDTH // 2 - 50, 30, 100, 100))
+        title = title_font.render("Charpets", True, WHITE)
+        screen.blit(title, title.get_rect(center=(WIDTH // 2, 170)))
+        
+        start_button.draw(screen)
+        exit_button.draw(screen)
 
-    # Платформи / обʼєкти світу
-    for platform in platforms:
-        draw.rect(screen, GREEN, platform)
+    else:
+        # У грі залишаємо звичайний колір фону
+        screen.fill(BG)
+        
+        current_platforms = platforms1 if state == LEVEL1 else platforms2
+        player.update(current_platforms)
+        for p in current_platforms:
+            pygame.draw.rect(screen, PLATFORM_COLOR, p)
+        player.draw(screen)
 
-        # 👉 З КАРТИНКОЮ:
-        # screen.blit(platform_img, platform)
+    pygame.display.flip()
+    clock.tick(FPS)
 
-    # Пес Амур
-    draw.rect(screen, BROWN, amur)
-
-    # 👉 З КАРТИНКОЮ:
-    # screen.blit(amur_img, amur)
-
-    display.update()
-
-quit()
-sys.exit()
+pygame.quit()
