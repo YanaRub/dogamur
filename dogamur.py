@@ -1,6 +1,16 @@
 import pygame
 from pygame import *
 
+pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load("pixelated-adventures_92797.mp3")
+pygame.mixer.music.play(-1)  
+
+photo = pygame.image.load("back1.jpg")
+photo = pygame.image.load("back2.jpg")
+photo = pygame.image.load("back3.jpg")
+photo = pygame.image.load("platform.jpg")
+
 # ==================== CONFIG ====================
 WIDTH, HEIGHT = 1200, 700
 FPS = 60
@@ -19,6 +29,7 @@ PLAYER_COLOR = (80, 200, 255)
 PLATFORM_COLOR = (200, 200, 200)
 
 # ==================== INIT ====================
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Platformer with Menu")
@@ -119,25 +130,70 @@ class Player(Rect):
         pygame.draw.rect(surface, PLAYER_COLOR, self)
 
 # ==================== LEVEL ====================
-platforms1 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
-              Rect(190, 150, 200, 20), 
-              Rect(500, 450, 180, 20),
-              Rect(190, 600, 350, 20),
-              Rect(600, 290, 350, 20)]
-
-platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
-              Rect(35, 280, 150, 20), 
-              Rect(350, 340, 180, 20),
-              Rect(450, 240, 180, 20),
-              Rect(650, 140, 180, 20),
-              Rect(800, 440, 230, 20)]
-
-platforms3 = [Rect(0, HEIGHT - 40, WIDTH, 40), 
-              Rect(30, 280, 180, 20), 
-              Rect(350, 340, 180, 20),
-              Rect(510, 240, 180, 20),
-              Rect(610, 440, 180, 20)]
-
+platforms1 = [
+    Rect(0, HEIGHT - 40, WIDTH, 40),
+    Rect(-65, 100, 70, 800),
+    Rect(120, 520, 60, 12),
+    Rect(260, 460, 50, 12),
+    Rect(380, 400, 45, 12),
+    Rect(520, 340, 40, 12),
+    Rect(650, 280, 35, 12),
+    Rect(780, 220, 30, 12),
+    Rect(880, 160, 25, 12),
+    Rect(1120, 100, 70, 800)
+]
+platforms2 = [
+    Rect(0, HEIGHT - 40, WIDTH, 40),
+    Rect(-65, 100, 70, 800),
+    Rect(60, 520, 90, 12),
+    Rect(180, 480, 70, 12),
+    Rect(300, 440, 80, 12),
+    Rect(420, 400, 65, 12),
+    Rect(540, 360, 75, 12),
+    Rect(660, 320, 60, 12),
+    Rect(780, 280, 70, 12),
+    Rect(900, 240, 55, 12),
+    Rect(820, 200, 60, 12),
+    Rect(744, 240, 70, 12),
+    Rect(460, 280, 65, 12),
+    Rect(280, 500, 80, 12),
+    Rect(1120, 120, 70, 600)
+]
+platforms3 = [
+    Rect(40, 520, 120, 14),
+    Rect(120, 480, 90, 14),
+    Rect(190, 440, 70, 14),
+    Rect(250, 400, 60, 14),
+    Rect(380, 360, 55, 12),
+    Rect(440, 320, 45, 12),
+    Rect(500, 280, 40, 12),
+    Rect(560, 240, 35, 12),
+    Rect(620, 200, 30, 12),
+    Rect(680, 170, 28, 12),
+    Rect(740, 140, 26, 12),
+    Rect(1120, 100, 70, 600)
+]
+platforms4 = [
+    Rect(0, HEIGHT - 40, WIDTH, 40),
+    Rect(150, 470, 70, 12),
+    Rect(620, 430, 60, 12),
+    Rect(300, 360, 50, 12),
+    Rect(800, 300, 45, 12),
+    Rect(420, 240, 40, 12),
+    Rect(950, 180, 35, 12),
+]
+platforms5 = [
+    Rect(0, HEIGHT - 40, WIDTH, 40),
+    Rect(-65, 100, 70, 800),
+    Rect(480, 500, 60, 12),
+    Rect(420, 440, 50, 12),
+    Rect(520, 380, 45, 12),
+    Rect(400, 320, 40, 12),
+    Rect(540, 260, 35, 12),
+    Rect(380, 200, 30, 12),
+    Rect(560, 140, 25, 12),
+    Rect(1120, 120, 70, 600)
+]
 player = Player(100, 100)
 
 # ==================== MAIN LOOP ====================
@@ -166,12 +222,7 @@ while running:
     if state == MENU:
         # 1. Малюємо картинку фону замість screen.fill
         screen.blit(menu_bg, (0, 0))
-        
-        # Логотип і текст зверху фону
-        pygame.draw.rect(screen, GREEN, (WIDTH // 2 - 50, 30, 100, 100))
-        title = title_font.render("Charpets", True, WHITE)
-        screen.blit(title, title.get_rect(center=(WIDTH // 2, 170)))
-        
+                
         start_button.draw(screen)
         exit_button.draw(screen)
 
