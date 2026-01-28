@@ -3,17 +3,26 @@ from pygame import *
 
 pygame.init()
 pygame.mixer.init()
-pygame.mixer.music.load("pixelated-adventures_92797.mp3")
-pygame.mixer.music.play(-1)  
-
-photo = pygame.image.load("back1.jpg")
-photo = pygame.image.load("back2.jpg")
-photo = pygame.image.load("back3.jpg")
-photo = pygame.image.load("platform.jpg")
+music_menu = "pixelated-adventures_92797.mp3"
+music_game = "retro"
+pygame.mixer.music.load(music_menu)
+pygame.mixer.music.play(-1)
+playing_music = "menu"
 
 # ==================== CONFIG ====================
 WIDTH, HEIGHT = 1200, 700
 FPS = 60
+
+back1 = pygame.transform.scale(image.load("back1.jpg"),(WIDTH, HEIGHT))
+back2 = pygame.transform.scale(image.load("back2.jpg"),(WIDTH, HEIGHT))
+back3 = pygame.transform.scale(image.load("back3.jpg"),(WIDTH, HEIGHT))
+platform = pygame.transform.scale(image.load("platform.jpg"),(WIDTH, HEIGHT))
+dog = pygame.transform.scale(image.load("dog.jpg"),(80, 120))
+
+menu_bg = pygame.image.load("background.jpg")
+menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
+level1_bg = pygame.image.load("back1.jpg")
+level1_bg = pygame.transform.scale(level1_bg, (WIDTH, HEIGHT))
 
 GRAVITY = 0.9
 PLAYER_SPEED = 6
@@ -32,17 +41,9 @@ PLATFORM_COLOR = (200, 200, 200)
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Platformer with Menu")
+pygame.display.set_caption("Dog Amur")
 clock = pygame.time.Clock()
 running = True
-
-try:
-    menu_bg = pygame.image.load("background.jpg") 
-    menu_bg = pygame.transform.scale(menu_bg, (WIDTH, HEIGHT))
-except:
-    # Якщо картинка не знайдена, створюємо просто темний фон, щоб гра не вилітала
-    menu_bg = pygame.Surface((WIDTH, HEIGHT))
-    menu_bg.fill((20, 20, 30))
 
 # ==================== FONTS ====================
 title_font = pygame.font.SysFont("comicsansms", 64, bold=True)
@@ -54,8 +55,20 @@ state = MENU
 LEVEL1 = "level1"
 LEVEL2 = "level2"
 LEVEL3 = "level3"
+LEVEL4 = "level4"
+LEVEL5 = "level5"
+
+score = 0
 
 # ==================== BUTTON ====================
+class Bone(Rect):
+    def __init__(self, x, y):
+        super().__init__(x, y, 40, 20)
+        self.collected = False
+    def draw(self, surface):
+        if not self.collected:
+            draw.rect(surface,(255, 255, 150), self, border_radius=5)
+
 class Button:
     def __init__(self, text, x, y, w, h):
         self.text = text
@@ -128,6 +141,7 @@ class Player(Rect):
 
     def draw(self, surface):
         pygame.draw.rect(surface, PLAYER_COLOR, self)
+        
 
 # ==================== LEVEL ====================
 platforms1 = [
@@ -196,6 +210,12 @@ platforms5 = [
 ]
 player = Player(100, 100)
 
+bones1 = [Bone(130, 490), Bone(530, 310)]
+bones2 = [Bone(70, 490), Bone(790, 250)]
+bones3 = [Bone(50, 490), Bone(510, 250)]
+bones4 = [Bone(160, 440), Bone(810, 270)]
+bones5 = [Bone(490, 470), Bone(550, 230)]
+
 # ==================== MAIN LOOP ====================
 while running:
     for event in pygame.event.get():
@@ -205,6 +225,7 @@ while running:
         if state == MENU:
             if start_button.clicked(event):
                 state = LEVEL1
+                score = 0
             if exit_button.clicked(event):
                 running = False
         
@@ -225,10 +246,19 @@ while running:
                 
         start_button.draw(screen)
         exit_button.draw(screen)
+        if playing_music != "menu":
+            mixer.music.load(music_menu)
+            mixer.music.play(-1)
+            playing.music="menu"
 
     else:
         # У грі залишаємо звичайний колір фону
         screen.fill(BG)
+        
+        if playing_music != "game":
+            mixer.music.load(music_game)
+            mixer.music.play(-1)
+            playing.music="game"
         
         current_platforms = platforms1 if state == LEVEL1 else platforms2
         if state == LEVEL1:
@@ -237,8 +267,10 @@ while running:
             current_platforms = platforms2
         elif state == LEVEL3:
             current_platforms = platforms3  
+        elif state == LEVEL4:
+            current_platforms = platforms4
         else:
-            current_platforms = platforms3
+            current_platforms = platforms5
         player.update(current_platforms)
         for p in current_platforms:
             pygame.draw.rect(screen, PLATFORM_COLOR, p)
