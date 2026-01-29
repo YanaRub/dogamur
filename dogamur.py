@@ -1,3 +1,39 @@
+import pygame
+from pygame import *
+
+pygame.init()
+pygame.mixer.init()
+
+WIDTH, HEIGHT = 1200, 700
+FPS = 60
+GRAVITY = 0.9
+PLAYER_SPEED = 6
+JUMP_FORCE = 18
+
+WHITE = (240, 240, 240)
+GRAY = (180, 180, 180)
+HOVER = (220, 220, 220)
+BONE_COLOR = (255, 255, 150)
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Dog Amur")
+clock = pygame.time.Clock()
+
+menu_bg = transform.scale(image.load("background.jpg"), (WIDTH, HEIGHT))
+back1 = transform.scale(image.load("back1.jpg"), (WIDTH, HEIGHT))
+back2 = transform.scale(image.load("back2.jpg"), (WIDTH, HEIGHT))
+back3 = transform.scale(image.load("back3.jpg"), (WIDTH, HEIGHT))
+dog_img = transform.scale(image.load("dog.png"), (110, 120))
+plat_img = image.load("platform.png")
+bone_img = image.load("bone2.png")
+
+music_menu = "pixelated-adventures_92797.mp3"
+music_game = "retro-dreamscape_92772.mp3"
+
+pygame.mixer.music.load(music_menu)
+pygame.mixer.music.play(-1)
+playing_music = "menu"
+
 button_font = pygame.font.SysFont("comicsansms", 28)
 score_font = pygame.font.SysFont("comicsansms", 36, bold=True)
 
