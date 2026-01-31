@@ -26,9 +26,15 @@ back3 = transform.scale(image.load("back3.jpg"), (WIDTH, HEIGHT))
 dog_img = transform.scale(image.load("dog.png"), (110, 120))
 plat_img = image.load("platform.png")
 bone_img = image.load("bone2.png")
+end_img = image.load("end.jpg")
 
 music_menu = "pixelated-adventures_92797.mp3"
 music_game = "retro-dreamscape_92772.mp3"
+
+step = pygame.mixer.Sound("elegant-high-heels-with-an-empty-reverb.mp3")
+jump = pygame.mixer.Sound("elegant-high-heels-with-an-empty-reverb.mp3")
+jump.set_volume(0.5)
+prizem = pygame.mixer.Sound("elegant-high-heels-with-an-empty-reverb.mp3")
 
 pygame.mixer.music.load(music_menu)
 pygame.mixer.music.play(-1)
@@ -83,12 +89,26 @@ class Player(Rect):
 
     def update(self, platforms, bones):
         keys = pygame.key.get_pressed()
+
         self.vel_x = 0
-        if keys[K_a] or keys[K_LEFT]: self.vel_x = -PLAYER_SPEED
-        if keys[K_d] or keys[K_RIGHT]: self.vel_x = PLAYER_SPEED
+        if keys[K_a] or keys[K_LEFT]:
+            self.vel_x = -PLAYER_SPEED
+        if keys[K_d] or keys[K_RIGHT]:
+            self.vel_x = PLAYER_SPEED
+
         if (keys[K_SPACE] or keys[K_w] or keys[K_UP]) and self.on_ground:
             self.vel_y = -JUMP_FORCE
-            self.on_ground = False
+            pygame.mixer.Channel(0).stop()
+            jump_channel = pygame.mixer.Channel(1)
+            pygame.mixer.Sound.play(jump)
+
+        channel = pygame.mixer.Channel(0)
+        if abs(self.vel_x) > 0 and self.on_ground:
+            if not channel.get_busy():
+                channel.play(step, loops=-1)
+        else:
+            channel.stop()
+        self.is_jumping = False
 
         self.vel_y += GRAVITY
 
@@ -125,6 +145,7 @@ class Player(Rect):
 platforms1 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(-65, 100, 70, 800), Rect(120, 520, 60, 12), Rect(260, 460, 50, 12),
               Rect(380, 400, 45, 12), Rect(520, 340, 40, 12), Rect(650, 280, 35, 12), Rect(780, 220, 30, 12),
               Rect(880, 160, 25, 12), Rect(1120, 100, 70, 800)]
+mount1 = [Rect(1120, 100, 70, 800)]
 platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(-65, 100, 70, 800), Rect(60, 520, 90, 12), Rect(180, 480, 70, 12),
               Rect(300, 440, 80, 12), Rect(420, 400, 65, 12), Rect(540, 360, 75, 12), Rect(660, 320, 60, 12),
               Rect(780, 280, 70, 12), Rect(900, 240, 55, 12), Rect(820, 200, 60, 12), Rect(744, 240, 70, 12),
@@ -133,16 +154,18 @@ platforms2 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(-65, 100, 70, 800), Rect(60,
               Rect(860, 360, 50, 10), Rect(950, 300, 45, 10), Rect(880, 330, 40, 10), Rect(600, 260, 55, 10),
               Rect(480, 240, 50, 10), Rect(360, 200, 60, 10), Rect(240, 180, 50, 10), Rect(100, 140, 60, 10),
               Rect(200, 120, 70, 10),]
+mount2 = [Rect(1120, 100, 70, 800)]
 platforms3 = [Rect(40, 520, 160, 16), Rect(260, 500, 80, 14), Rect(380, 460, 60, 14), Rect(300, 400, 40, 12),
               Rect(420, 370, 35, 12), Rect(600, 340, 120, 14), Rect(760, 300, 30, 12), Rect(820, 260, 28, 12),
               Rect(780, 220, 26, 12), Rect(900, 240, 100, 10), Rect(1040, 180, 60, 12), Rect(1120, 150, 70, 600),
               Rect(110, 470, 26, 8), Rect(210, 450, 22, 8), Rect(340, 360, 20, 8), Rect(460, 330, 18, 8),
               Rect(520, 300, 22, 8), Rect(650, 280, 24, 8), Rect(720, 260, 20, 8), Rect(790, 180, 18, 8),
               Rect(840, 160, 18, 8), Rect(960, 200, 22, 8), Rect(1020, 140, 20, 8), Rect(580, 140, 26, 8),
-              Rect(420, 120, 24, 8),]
-platforms4 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(120, 480, 90, 14), Rect(300, 430, 80, 14),
-              Rect(500, 380, 70, 14), Rect(700, 330, 60, 14), Rect(880, 280, 55, 14), Rect(650, 220, 60, 14),
-              Rect(400, 170, 70, 14)]
+              Rect(1120, 100, 70, 800), Rect(-10, 900, 900, 60)]
+platforms4 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(80, 520, 120, 16), Rect(150, 480, 110, 16),
+              Rect(220, 440, 100, 16), Rect(300, 400, 90, 14), Rect(380, 360, 80, 14), Rect(460, 320, 80, 14),
+              Rect(540, 280, 80, 14), Rect(620, 240, 80, 14), Rect(700, 210, 80, 14), Rect(780, 180, 80, 14),
+              Rect(860, 150, 80, 14), Rect(940, 120, 200, 20),]
 platforms5 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(-65, 100, 70, 800), Rect(480, 500, 60, 12), Rect(420, 440, 50, 12),
               Rect(520, 380, 45, 12), Rect(400, 320, 40, 12), Rect(540, 260, 35, 12), Rect(380, 200, 30, 12),
               Rect(560, 140, 25, 12), Rect(1120, 120, 70, 600)]
@@ -174,6 +197,7 @@ while running:
         if playing_music != "menu":
             mixer.music.load(music_menu)
             mixer.music.play(-1)
+            mixer.music.set_volume(0.9)
             playing_music = "menu"
         screen.blit(menu_bg, (0, 0))
         start_btn.draw(screen)
@@ -183,6 +207,7 @@ while running:
             mixer.music.load(music_game)
             mixer.music.play(-1)
             playing_music = "game"
+            mixer.music.set_volume(0.3)
 
         if state == LEVEL1:
             screen.blit(back1, (0, 0))
@@ -198,12 +223,12 @@ while running:
             screen.blit(back3, (0, 0))
             cur_p, cur_b = platforms3, bones3
             if player.right > WIDTH:
-                state, player.x, player.y = MENU, 100, 100
+                state, player.x, player.y = LEVEL4, 100, 100
         elif state == LEVEL4:
             screen.blit(back3, (0, 0))
             cur_p, cur_b = platforms4, bones4
             if player.right > WIDTH:
-                state, player.x, player.y = MENU, 100, 100
+                state, player.x, player.y = LEVEL5, 100, 100
         elif state == LEVEL5:
             screen.blit(back3, (0, 0))
             cur_p, cur_b = platforms5, bones5
