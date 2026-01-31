@@ -8,7 +8,7 @@ WIDTH, HEIGHT = 1200, 700
 FPS = 60
 GRAVITY = 0.9
 PLAYER_SPEED = 6
-JUMP_FORCE = 18
+JUMP_FORCE = 35
 
 WHITE = (240, 240, 240)
 GRAY = (180, 180, 180)
@@ -23,6 +23,8 @@ menu_bg = transform.scale(image.load("background.jpg"), (WIDTH, HEIGHT))
 back1 = transform.scale(image.load("back1.jpg"), (WIDTH, HEIGHT))
 back2 = transform.scale(image.load("back2.jpg"), (WIDTH, HEIGHT))
 back3 = transform.scale(image.load("back3.jpg"), (WIDTH, HEIGHT))
+back4 = transform.scale(image.load("back4.jpg"), (WIDTH, HEIGHT))
+back5 = transform.scale(image.load("back5.jpg"), (WIDTH, HEIGHT))
 dog_img = transform.scale(image.load("dog.png"), (110, 120))
 plat_img = image.load("platform.png")
 bone_img = image.load("bone2.png")
@@ -49,6 +51,7 @@ LEVEL2 = "level2"
 LEVEL3 = "level3"
 LEVEL4 = "level4"
 LEVEL5 = "level5"
+END = "end"
 state = MENU
 score = 0
 
@@ -161,7 +164,8 @@ platforms3 = [Rect(40, 520, 160, 16), Rect(260, 500, 80, 14), Rect(380, 460, 60,
               Rect(110, 470, 26, 8), Rect(210, 450, 22, 8), Rect(340, 360, 20, 8), Rect(460, 330, 18, 8),
               Rect(520, 300, 22, 8), Rect(650, 280, 24, 8), Rect(720, 260, 20, 8), Rect(790, 180, 18, 8),
               Rect(840, 160, 18, 8), Rect(960, 200, 22, 8), Rect(1020, 140, 20, 8), Rect(580, 140, 26, 8),
-              Rect(1120, 100, 70, 800), Rect(-10, 900, 900, 60)]
+              Rect(1120, 100, 70, 800),]
+mount3 = [Rect(-10, 900, 900, 60)]
 platforms4 = [Rect(0, HEIGHT - 40, WIDTH, 40), Rect(80, 520, 120, 16), Rect(150, 480, 110, 16),
               Rect(220, 440, 100, 16), Rect(300, 400, 90, 14), Rect(380, 360, 80, 14), Rect(460, 320, 80, 14),
               Rect(540, 280, 80, 14), Rect(620, 240, 80, 14), Rect(700, 210, 80, 14), Rect(780, 180, 80, 14),
@@ -225,15 +229,21 @@ while running:
             if player.right > WIDTH:
                 state, player.x, player.y = LEVEL4, 100, 100
         elif state == LEVEL4:
-            screen.blit(back3, (0, 0))
+            screen.blit(back4, (0, 0))
             cur_p, cur_b = platforms4, bones4
             if player.right > WIDTH:
                 state, player.x, player.y = LEVEL5, 100, 100
         elif state == LEVEL5:
-            screen.blit(back3, (0, 0))
+            screen.blit(back5, (0, 0))
             cur_p, cur_b = platforms5, bones5
             if player.right > WIDTH:
-                state, player.x, player.y = MENU, 100, 100
+                cur_p.clear()
+                cur_b.clear()
+                pygame.mixer_music.stop()
+                state = END
+        elif state == END:
+            screen.blit(end_img, (0, 0))
+
 
         player.update(cur_p, cur_b)
         for p in cur_p:
