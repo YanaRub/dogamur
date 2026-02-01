@@ -13,7 +13,7 @@ JUMP_FORCE = 20
 WHITE = (240, 240, 240)
 GRAY = (180, 180, 180)
 HOVER = (220, 220, 220)
-GREEN = (50, 200, 50) 
+GREEN = (50, 200, 50)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dog Amur")
@@ -24,7 +24,7 @@ menu_bg = transform.scale(image.load("background.jpg"), (WIDTH, HEIGHT))
 try:
     history_bg = transform.scale(image.load("history.jpg"), (WIDTH, HEIGHT))
 except:
-    history_bg = menu_bg # Якщо картинки немає, буде фон меню
+    history_bg = menu_bg  # Якщо картинки немає, буде фон меню
 
 back1 = transform.scale(image.load("back1.jpg"), (WIDTH, HEIGHT))
 back2 = transform.scale(image.load("back2.jpg"), (WIDTH, HEIGHT))
@@ -66,15 +66,16 @@ END = "end"
 state = MENU
 score = 0
 
-
 story_text_lines = [
-    "Once upon a time, there was a dog named Amur...",
-    "He decided to find all the lost bones."
+    "Прривітусики мою любі друзі. Не так давно сталася зі мною одна пригода....",
+    "Я загубився. Але ж я розумнй пес і розумів куди я йду!",
+    "Тому давайте я ще раз переживу цю історію з вами!"
 ]
 current_line = 0
 current_char = 0
-text_timer = 0
-char_speed = 3  
+text_timer = 5
+char_speed = 0
+
 
 class Hill(Rect):
     def __init__(self, x, y):
@@ -83,6 +84,7 @@ class Hill(Rect):
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
+
 
 class Bone(Rect):
     def __init__(self, x, y):
@@ -94,6 +96,7 @@ class Bone(Rect):
     def draw(self, surface):
         if not self.collected:
             surface.blit(self.image, self.topleft)
+
 
 class Button:
     def __init__(self, text, x, y, w, h):
@@ -138,7 +141,7 @@ class Player(Rect):
                 walk_channel.play(step, loops=-1)
         else:
             walk_channel.stop()
-        
+
         self.is_jumping = False
 
         self.vel_y += GRAVITY
@@ -153,7 +156,7 @@ class Player(Rect):
 
         self.y += self.vel_y
         self.on_ground = False
-        
+
         for p in platforms + hills:
             if self.colliderect(p):
                 if self.vel_y > 0:
@@ -189,7 +192,7 @@ platforms2 = [floor, Rect(60, 520, 110, 15), Rect(180, 480, 90, 15),
               Rect(350, 520, 70, 15), Rect(520, 500, 80, 15), Rect(620, 420, 70, 15), Rect(740, 390, 65, 15),
               Rect(860, 360, 70, 15), Rect(950, 300, 65, 15), Rect(880, 330, 60, 15), Rect(600, 260, 75, 15),
               Rect(480, 240, 70, 15), Rect(360, 200, 80, 15), Rect(240, 180, 70, 15), Rect(100, 140, 80, 15),
-              Rect(200, 120, 90, 15),]
+              Rect(200, 120, 90, 15), ]
 hills2 = [Hill(1120, 310)]
 bones2 = [Bone(70, 560), Bone(830, 155), Bone(110, 475), Bone(550, 315)]
 
@@ -198,31 +201,31 @@ platforms3 = [floor, Rect(40, 520, 180, 16), Rect(260, 500, 100, 14), Rect(380, 
               Rect(780, 220, 46, 12), Rect(900, 240, 120, 10), Rect(1040, 180, 80, 12),
               Rect(110, 470, 46, 15), Rect(210, 450, 42, 15), Rect(340, 360, 40, 15), Rect(460, 330, 38, 15),
               Rect(520, 300, 42, 15), Rect(650, 280, 44, 15), Rect(720, 260, 40, 15), Rect(790, 180, 38, 15),
-              Rect(840, 160, 38, 15), Rect(960, 200, 42, 15), Rect(1020, 140, 40, 15), Rect(580, 140, 46, 15),]
+              Rect(840, 160, 38, 15), Rect(960, 200, 42, 15), Rect(1020, 140, 40, 15), Rect(580, 140, 46, 15), ]
 hills3 = [Hill(1120, 310)]
 bones3 = [Bone(50, 475), Bone(620, 295)]
 
-hills4 = [             ]
+hills4 = []
 platforms4 = [floor, Rect(80, 520, 140, 16), Rect(150, 480, 130, 16),
               Rect(220, 440, 120, 16), Rect(300, 400, 110, 14), Rect(380, 360, 100, 14), Rect(460, 320, 100, 14),
               Rect(540, 280, 100, 14), Rect(620, 240, 100, 14), Rect(700, 210, 100, 14), Rect(780, 180, 100, 14),
-              Rect(860, 150, 100, 14), Rect(940, 120, 220, 20),]
+              Rect(860, 150, 100, 14), Rect(940, 120, 220, 20), ]
 bones4 = [Bone(180, 435), Bone(820, 135)]
 
 platforms5 = [
-    floor, 
-    Rect(450, 550, 100, 15), 
-    Rect(600, 470, 90, 15),  
-    Rect(450, 390, 80, 15),  
-    Rect(600, 310, 70, 15),  
-    Rect(450, 230, 60, 15),  
-    Rect(580, 150, 300, 15)  
+    floor,
+    Rect(450, 550, 100, 15),
+    Rect(600, 470, 90, 15),
+    Rect(450, 390, 80, 15),
+    Rect(600, 310, 70, 15),
+    Rect(450, 230, 60, 15),
+    Rect(580, 150, 300, 15)
 ]
 hills5 = [Hill(-65, 310), Hill(1120, 310)]
 bones5 = [Bone(490, 455), Bone(560, 185)]
 
 player = Player(100, 100)
-start_btn = Button("START", WIDTH // 2 - 80, HEIGHT // 2 + 40, 160, 50,)
+start_btn = Button("START", WIDTH // 2 - 80, HEIGHT // 2 + 40, 160, 50, )
 exit_btn = Button("EXIT", WIDTH // 2 - 80, HEIGHT // 2 + 110, 160, 50)
 next_btn = Button("NEXT", WIDTH - 180, HEIGHT - 80, 150, 50)
 
@@ -257,15 +260,15 @@ while running:
         screen.blit(menu_bg, (0, 0))
         start_btn.draw(screen)
         exit_btn.draw(screen)
-    
+
     elif state == STORY:
         screen.blit(history_bg, (0, 0))
-        
+
         s = Surface((WIDTH, 200))
         s.set_alpha(150)
         s.fill((0, 0, 0))
         screen.blit(s, (0, HEIGHT - 200))
-        
+
         # Ефект друкарської машинки
         text_timer += 1
         if text_timer >= char_speed:
@@ -276,17 +279,17 @@ while running:
                 elif current_line < len(story_text_lines) - 1:
                     current_line += 1
                     current_char = 0
-        
+
         # Малювання тексту
         y_offset = HEIGHT - 150
         for i in range(current_line + 1):
             line_to_draw = story_text_lines[i]
             if i == current_line:
                 line_to_draw = line_to_draw[:current_char]
-            
+
             rendered_text = story_font.render(line_to_draw, True, WHITE)
             screen.blit(rendered_text, (50, y_offset + i * 50))
-        
+
         # Кнопка NEXT з'являється лише коли весь текст надруковано
         if current_line == len(story_text_lines) - 1 and current_char == len(story_text_lines[-1]):
             next_btn.draw(screen)
@@ -297,10 +300,10 @@ while running:
             mixer.music.play(-1)
             mixer.music.set_volume(0.9)
             playing_music = "menu"
-        
+
         mixer.Channel(0).stop()
         mixer.Channel(1).stop()
-        
+
         screen.blit(end_img, (0, 0))
 
     else:
@@ -346,7 +349,7 @@ while running:
                 draw.rect(screen, GREEN, p)
             else:
                 screen.blit(transform.scale(plat_img, (p.width, p.height)), (p.x, p.y))
-        
+
         for h in cur_h:
             h.draw(screen)
         for b in cur_b:
